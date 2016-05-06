@@ -20,3 +20,4 @@ The current way of using git-ss13 generally follows the pattern:
 * Add configuration strings to your distribution and configuration files.
 * Hook your player save/load mechanisms to update_one/retrieve_one using previously mentioned configuration and scripts/sync.py.
 * Hook a timed event and/or roundend to push changes.
+* Configure a git repo manually under data/, this may also be done using sync.py, but a remote will still need to be set up.
