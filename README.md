@@ -12,7 +12,6 @@ To create a...
 
 ## Project status
 This is currently a work-in-progress and features may be added and deleted at any time. Some features mentioned in this readme might not even exist yet, YMMV.
-(Note: Migration in progress, some files may not yet be available let alone exist.)
 
 ## Usage
 The current way of using git-ss13 generally follows the pattern:
