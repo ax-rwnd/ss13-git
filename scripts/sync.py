@@ -57,11 +57,31 @@ def update_one (path, ckey):
 		print "Failed to update, error: "+e
 		time.sleep(5)
 
+# Retrieve all saves
 def retrieve_all (path):
-	pass
+	remotes = Repo(path).remotes
+	if len(remotes)==1:
+		remotes[0].pull()
+	elif len(remotes)==0:
+		print "No remotes!"
+	else:
+		print "Multiple remotes!"
+	
 
+# Retrieves latest saves for ckey
 def retrieve_one (path, ckey):
 	pass
+
+# Pushes changes to repo
+def push_changes (path):
+	remotes = Repo(path).remotes
+	if len(remotes)==1:
+		remotes[0].pull()
+		remotes[0].push()
+	elif len(remotes)==0:
+		print "No remotes!"
+	else:
+		print "Multiple remotes!"
 	
 
 if __name__ == "__main__": #parse shell command from byond
@@ -79,6 +99,10 @@ if __name__ == "__main__": #parse shell command from byond
 		# Retrieve all saves from repo
 		elif "retall" in sys.argv[1]:
 			retrieve_one(sys.argv[2])
+		
+		# Push changes
+		elif "push" in sys.argv[1]:
+			push_changes(sys.argv[2])
 
 	elif len(sys.argv)==4: #sync.py (action) (repo-path) (ckey)
 
