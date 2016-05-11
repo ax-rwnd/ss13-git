@@ -8,7 +8,8 @@ To create a...
 
 ## Requirements
 * Python 2
-* GitPython2
+* Git
+* GitPython 2.0.2
 
 ## Project status
 This is currently a work-in-progress and features may be added and deleted at any time. Some features mentioned in this readme might not even exist yet, YMMV.
