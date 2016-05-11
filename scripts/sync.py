@@ -8,7 +8,7 @@ def get_path(repo_path, name):
 	return os.path.normpath(os.path.join(repo_path,"player_saves",name[0],name,"*.sav"))
 
 # Create a working repo for the script as defined by path
-def create_repo (path, remote, ignore=False, existing=True):
+def create_repo (path, remote, ignore=False, existing=True, push=True):
 	if not os.path.exists(path):
 		raise IOError("No such directory!")
 
@@ -26,6 +26,7 @@ def create_repo (path, remote, ignore=False, existing=True):
 		fs.write("\0")
 		fs.close()
 
+	#Commit .gitignore
 	repo.git.add(pd)
 	repo.git.commit(m="Initial commit.")
 
@@ -35,7 +36,7 @@ def create_repo (path, remote, ignore=False, existing=True):
 	cw.set_value("pull", "default", "current")
 	cw.release()
 
-	#Add remote
+	#Add origin remote
 	origin = repo.create_remote('origin', remote)
 	origin.fetch()
 	assert origin.exists()
@@ -46,15 +47,16 @@ def create_repo (path, remote, ignore=False, existing=True):
 
 	#Commit existing files
 	if existing and len(repo.untracked_files)>0:
-		for f in repo.untracked_files:
-			repo.git.add(f)
-		repo.git.commit(m="Added existing files")
-	origin.push()
+		repo.git.add("player_saves/*")
+		repo.git.commit(m="Added existing savefiles")
+
+	#Push to remote
+	if push:
+		origin.push()
 
 
 # Update all files
 def update_all (path):
-	print "path is", path
 	repo = Repo(path, search_parent_directories=True)
 	repo.git.add("player_saves/*")
 
