@@ -7,20 +7,8 @@ from git import Repo, GitCommandError, Git
 def get_path(repo_path, name):
 	return os.path.normpath(os.path.join(repo_path,"player_saves",name[0],name,"*.sav"))
 
-# Writes a simple .gitignore
-def write_gitignore (pd):
-
-	# write .gitignore and commit
-	try:
-		fs = open(pd, "w")
-		fs.write("# Automatically generated\n*.sw*\n!.gitignore\n!*.sav")
-		fs.close()
-		print "Wrote .gitignore"
-	except Exception as e:
-		print "Failed to generate .gitignore, error: "+str(e)
-
 # Create a working repo for the script as defined by path
-def create_repo (path, remote, empty=False):
+def create_repo (path, remote, ignore=False, existing=True):
 	if not os.path.exists(path):
 		raise IOError("No such directory!")
 
@@ -28,9 +16,10 @@ def create_repo (path, remote, empty=False):
 
 	# Generate a .gitignore
 	pd = os.path.join(path,".gitignore")
-	if not empty:
-		#Write a standard .gitignore
-		write_gitignore(pd)
+	if ignore:
+		fs = open(pd, "w")
+		fs.write("# Automatically generated\n*.sw*\n!.gitignore\n!*.sav")
+		fs.close()
 	else:
 		#Write empty gitignore (gitpython limitation?)
 		fs = open(pd, "w")
@@ -55,9 +44,11 @@ def create_repo (path, remote, empty=False):
 	#Create master branch
 	repo.create_head('master')
 
-	for f in repo.untracked_files:
-		repo.git.add(f)
-	repo.git.commit(m="Test!")
+	#Commit existing files
+	if existing and len(repo.untracked_files)>0:
+		for f in repo.untracked_files:
+			repo.git.add(f)
+		repo.git.commit(m="Added existing files")
 	origin.push()
 
 
@@ -66,7 +57,7 @@ def update_all (path):
 	print "path is", path
 	repo = Repo(path, search_parent_directories=True)
 	repo.git.add("player_saves/*")
-	print [str(b) for b in repo.heads]
+
 	if len(repo.index.diff("HEAD"))>0:
 		repo.git.add(update=True)
 		repo.git.commit(m="Performed full update at "+str(int(time.time())))
