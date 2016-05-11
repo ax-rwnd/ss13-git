@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 
 # Synchronizes the current player files with a git-repo
 import os, sys, time
@@ -16,8 +15,9 @@ def write_gitignore (pd):
 		fs = open(pd, "w")
 		fs.write("# Automatically generated\n*.sw*\n!.gitignore\n!*.sav")
 		fs.close()
+		print "Wrote .gitignore"
 	except Exception as e:
-		print "Failed to generate .gitignore, error: "+e
+		print "Failed to generate .gitignore, error: "+str(e)
 
 # Create a working repo for the script as defined by path
 def create_repo (path, remote, empty=False):
@@ -25,31 +25,48 @@ def create_repo (path, remote, empty=False):
 		raise IOError("No such directory!")
 
 	repo = Repo.init(path, bare=False)
-	g = Git(path)
-	origin = repo.create_remote('origin', remote)
-	g.fetch()
-	g.checkout('master')
 
-	# Generate a .gitignore and commit
+	# Generate a .gitignore
+	pd = os.path.join(path,".gitignore")
 	if not empty:
 		#Write a standard .gitignore
-		pd = os.path.join(path,".gitignore")
 		write_gitignore(pd)
+	else:
+		#Write empty gitignore (gitpython limitation?)
+		fs = open(pd, "w")
+		fs.write("\0")
+		fs.close()
 
-		try:
-			print pd
-			repo.git.add(pd, update=True)
-			repo.git.commit(m="Initial commit")
-			origin.push()
-		except Exception as e:
-			print "Repo setup failed, error: "+str(e)
-			time.sleep(5)
+	repo.git.add(pd)
+	repo.git.commit(m="Initial commit.")
+
+	#Set defaults
+	cw = repo.config_writer()
+	cw.set_value("push", "default", "current")
+	cw.set_value("pull", "default", "current")
+	cw.release()
+
+	#Add remote
+	origin = repo.create_remote('origin', remote)
+	origin.fetch()
+	assert origin.exists()
+	assert origin == repo.remotes.origin == repo.remotes['origin']
+
+	#Create master branch
+	repo.create_head('master')
+
+	for f in repo.untracked_files:
+		repo.git.add(f)
+	repo.git.commit(m="Test!")
+	origin.push()
 
 
 # Update all files
 def update_all (path):
-	repo = Repo(path)
+	print "path is", path
+	repo = Repo(path, search_parent_directories=True)
 	repo.git.add("player_saves/*")
+	print [str(b) for b in repo.heads]
 	if len(repo.index.diff("HEAD"))>0:
 		repo.git.add(update=True)
 		repo.git.commit(m="Performed full update at "+str(int(time.time())))
@@ -119,7 +136,7 @@ if __name__ == "__main__": #parse shell command from byond or term
 		# Create a working repo for sync
 		if "init" in sys.argv[1]:
 			print sys.argv[2], sys.argv[3]
-			create_repo(sys.argv[2], sys.argv[3])
+			create_repo(sys.argv[2], sys.argv[3], True)
 
 		# Update specific ckey
 		elif "updone" in sys.argv[1]:
