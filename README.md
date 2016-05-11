@@ -16,8 +16,8 @@ This is currently a work-in-progress and features may be added and deleted at an
 
 ## Usage
 The current way of using git-ss13 generally follows the pattern:
-* Clone the repo into your distribution's root directory.
+* Clone the repo into your distribution's root directory (making a separate .git for it is probably advisable).
 * Add configuration strings to your distribution and configuration files.
 * Hook your player save/load mechanisms to update_one/retrieve_one using previously mentioned configuration and scripts/sync.py.
 * Hook a timed event and/or roundend to push changes.
-* Configure a git repo manually under data/, this may also be done using sync.py, but a remote will still need to be set up.
+* Configure a git repo under data/ using "sync.py init SS13_PATH/data REMOTE_PATH".
