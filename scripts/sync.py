@@ -54,6 +54,9 @@ def create_repo (path, remote, ignore=False, existing=True, push=True):
 	if push:
 		origin.push()
 
+# Clone into an existing repo
+def clone_repo (path, remote):
+	pass
 
 # Update all files
 def update_all (path):
@@ -131,6 +134,10 @@ if __name__ == "__main__": #parse shell command from byond or term
 			print sys.argv[2], sys.argv[3]
 			create_repo(sys.argv[2], sys.argv[3], True)
 
+		# Clone into an existing repo
+		elif "clone" in sys.argv[1]:
+			clone(sys.argv[2], sys.argv[3])
+
 		# Update specific ckey
 		elif "updone" in sys.argv[1]:
 			update_one(sys.argv[2], sys.argv[3])
@@ -144,6 +151,7 @@ if __name__ == "__main__": #parse shell command from byond or term
 	else:
 		print """Usage: sync.py (command) (repo) [args...]
 	init (repo) (remote) Initialize the repo.
+	clone (repo) (remote) Clone into an existing repo.
 	updall (repo) Commit all changes to repo.
 	updone (repo) (ckey) Update changes for ckey.
 	retall (repo) Retrieve all changes from remote.
