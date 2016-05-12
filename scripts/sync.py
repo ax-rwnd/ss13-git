@@ -7,6 +7,12 @@ from git import Repo, GitCommandError, Git
 def get_path(repo_path, name):
 	return os.path.normpath(os.path.join(repo_path,"player_saves",name[0],name,"*.sav"))
 
+def set_defaults (repo):
+	cw = repo.config_writer()
+	cw.set_value("push", "default", "current")
+	cw.set_value("pull", "default", "current")
+	cw.release()
+
 # Create a working repo for the script as defined by path
 def create_repo (path, remote, ignore=False, existing=True, push=True):
 	if not os.path.exists(path):
@@ -31,10 +37,7 @@ def create_repo (path, remote, ignore=False, existing=True, push=True):
 	repo.git.commit(m="Initial commit.")
 
 	#Set defaults
-	cw = repo.config_writer()
-	cw.set_value("push", "default", "current")
-	cw.set_value("pull", "default", "current")
-	cw.release()
+	set_defaults(repo)
 
 	#Add origin remote
 	origin = repo.create_remote('origin', remote)
@@ -56,7 +59,14 @@ def create_repo (path, remote, ignore=False, existing=True, push=True):
 
 # Clone into an existing repo
 def clone_repo (path, remote):
-	pass
+
+	# Clone into repo
+	repo = Repo.clone_from(remote, path)
+	assert repo is not Repo
+
+	# Write config defaults
+	set_defaults(repo)
+	
 
 # Update all files
 def update_all (path):
@@ -131,12 +141,11 @@ if __name__ == "__main__": #parse shell command from byond or term
 	elif len(sys.argv)==4: #sync.py (action) (repo-path) (arg)
 		# Create a working repo for sync
 		if "init" in sys.argv[1]:
-			print sys.argv[2], sys.argv[3]
 			create_repo(sys.argv[2], sys.argv[3], True)
 
 		# Clone into an existing repo
 		elif "clone" in sys.argv[1]:
-			clone(sys.argv[2], sys.argv[3])
+			clone_repo(sys.argv[2], sys.argv[3])
 
 		# Update specific ckey
 		elif "updone" in sys.argv[1]:
