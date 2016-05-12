@@ -97,7 +97,6 @@ def retrieve_all (path):
 		print "No remotes!"
 	else:
 		print "Multiple remotes!"
-	
 
 # Retrieves latest saves for ckey
 def retrieve_one (path, ckey):
@@ -105,17 +104,14 @@ def retrieve_one (path, ckey):
 
 # Pushes changes to repo
 def push_changes (path):
-	remotes = Repo(path).remotes
-	if len(remotes)==1:
-		remotes[0].pull()
-		remotes[0].push()
-	elif len(remotes)==0:
-		print "No remotes!"
-	else:
-		print "Multiple remotes!"
-	
+	repo = Repo(path, search_parent_directories=True)
+	origin = repo.remotes['origin']
 
-if __name__ == "__main__": #parse shell command from byond or term
+	# Pull & Push
+	origin.pull()
+	origin.push()
+
+if __name__ == "__main__":
 
 	# Missing second arg
 	if len(sys.argv)==2:
