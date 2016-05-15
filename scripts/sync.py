@@ -1,4 +1,3 @@
-
 # Synchronizes the current player files with a git-repo
 import os, sys, time
 from git import Repo, GitCommandError, Git
@@ -15,6 +14,8 @@ def set_defaults (repo):
 
 # Create a working repo for the script as defined by path
 def create_repo (path, remote, ignore=False, existing=True, push=True):
+
+	# Check if dir exists, might be removed
 	if not os.path.exists(path):
 		raise IOError("No such directory!")
 
@@ -70,6 +71,7 @@ def clone_repo (path, remote):
 
 # Update all files
 def update_all (path):
+
 	repo = Repo(path, search_parent_directories=True)
 	repo.git.add("player_saves/*")
 
@@ -90,13 +92,12 @@ def update_one (path, ckey):
 
 # Retrieve all saves
 def retrieve_all (path):
-	remotes = Repo(path).remotes
-	if len(remotes)==1:
-		remotes[0].pull()
-	elif len(remotes)==0:
-		print "No remotes!"
-	else:
-		print "Multiple remotes!"
+
+	repo = Repo(path, search_parent_directories=True)
+	origin = repo.remotes['origin']
+
+	# Pull changes TODO: design push-pull protocol
+	origin.pull()
 
 # Retrieves latest saves for ckey
 def retrieve_one (path, ckey):
@@ -104,6 +105,7 @@ def retrieve_one (path, ckey):
 
 # Pushes changes to repo
 def push_changes (path):
+
 	repo = Repo(path, search_parent_directories=True)
 	origin = repo.remotes['origin']
 
