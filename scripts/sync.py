@@ -84,11 +84,8 @@ def update_one (path, ckey):
 	repo = Repo(path)
 	repo.git.add(get_path(path, ckey))
 
-	try:
-		repo.git.commit(m="Updates "+ckey+" for "+str(int(time.time())))
-	except GitCommandError as e:
-		print "Failed to update, error: "+e
-		time.sleep(5)
+	# Commit saves
+	repo.git.commit(m="Updates "+ckey+" for "+str(int(time.time())))
 
 # Retrieve all saves
 def retrieve_all (path):
