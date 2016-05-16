@@ -101,7 +101,12 @@ def retrieve_all (path):
 
 # Retrieves latest saves for ckey
 def retrieve_one (path, ckey):
-	pass
+
+	repo = Repo(path, search_parent_directories=True)
+	origin = repo.remotes['origin']
+
+	origin.fetch()
+	repo.git.execute("git", "checkout", get_path(path,ckey))
 
 # Pushes changes to repo
 def push_changes (path):
