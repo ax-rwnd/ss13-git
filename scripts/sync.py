@@ -12,6 +12,11 @@ def set_defaults (repo):
 	cw.set_value("pull", "default", "current")
 	cw.release()
 
+def get_repo (path):
+	repo = Repo(path, search_parent_directories=True) #TODO: evaluate the use of search_parent...
+	assert repo is not Repo
+	return repo
+
 # Create a working repo for the script as defined by path
 def create_repo (path, remote, ignore=False, existing=True, push=True):
 
@@ -72,7 +77,7 @@ def clone_repo (path, remote):
 # Update all files
 def update_all (path):
 
-	repo = Repo(path, search_parent_directories=True)
+	repo = get_repo(path)
 	repo.git.add("player_saves/*")
 
 	if len(repo.index.diff("HEAD"))>0:
@@ -81,7 +86,7 @@ def update_all (path):
 
 # Update a particular ckey
 def update_one (path, ckey):
-	repo = Repo(path)
+	repo = get_repo(path) 
 	repo.git.add(get_path(path, ckey))
 
 	# Commit saves
@@ -90,7 +95,7 @@ def update_one (path, ckey):
 # Retrieve all saves
 def retrieve_all (path):
 
-	repo = Repo(path, search_parent_directories=True)
+	repo = get_repo(path) 
 	origin = repo.remotes['origin']
 
 	# Pull changes TODO: design push-pull protocol
@@ -99,7 +104,7 @@ def retrieve_all (path):
 # Retrieves latest saves for ckey
 def retrieve_one (path, ckey):
 
-	repo = Repo(path, search_parent_directories=True)
+	repo = get_repo(path) 
 	origin = repo.remotes['origin']
 
 	origin.fetch()
@@ -108,7 +113,7 @@ def retrieve_one (path, ckey):
 # Pushes changes to repo
 def push_changes (path):
 
-	repo = Repo(path, search_parent_directories=True)
+	repo = get_repo(path)
 	origin = repo.remotes['origin']
 
 	# Pull & Push
