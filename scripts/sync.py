@@ -14,7 +14,8 @@ def set_defaults (repo):
 
 def get_repo (path):
 	repo = Repo(path, search_parent_directories=True) #TODO: evaluate the use of search_parent...
-	assert repo is not Repo
+	assert repo.__class__ is Repo
+	assert os.path.isdir(repo.working_tree_dir)
 	return repo
 
 # Create a working repo for the script as defined by path
@@ -86,6 +87,7 @@ def update_all (path):
 
 # Update a particular ckey
 def update_one (path, ckey):
+
 	repo = get_repo(path) 
 	repo.git.add(get_path(path, ckey))
 
@@ -98,8 +100,8 @@ def retrieve_all (path):
 	repo = get_repo(path) 
 	origin = repo.remotes['origin']
 
-	# Pull changes TODO: design push-pull protocol
-	origin.pull()
+	# Pull changes ignore local changes
+	origin.pull(s="recursive", X="theirs", no_edit=True)
 
 # Retrieves latest saves for ckey
 def retrieve_one (path, ckey):
@@ -108,7 +110,7 @@ def retrieve_one (path, ckey):
 	origin = repo.remotes['origin']
 
 	origin.fetch()
-	repo.git.execute("git", "checkout", get_path(path,ckey))
+	repo.git.execute("git checkout {}".format(get_path(path,ckey)))
 
 # Pushes changes to repo
 def push_changes (path):
@@ -134,7 +136,7 @@ if __name__ == "__main__":
 
 		# Retrieve all saves from repo
 		elif "retall" in sys.argv[1]:
-			retrieve_one(sys.argv[2])
+			retrieve_all(sys.argv[2])
 		
 		# Push changes
 		elif "push" in sys.argv[1]:
